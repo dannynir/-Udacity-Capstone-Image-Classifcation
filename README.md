@@ -18,26 +18,63 @@ Upload the data to an S3 bucket through the AWS Gateway so that SageMaker has ac
 I chose to finetune the resnet50 model due to its relevance to image classification. The data had 5 classes, so I attached a linear layer with outcome size of 5. I chose to tune hyper parameters related to learning rate in the range from 0.0001 to 0.01 and batch size in the range of [32, 64, 128]
 
 Screenshot of completed training jobs:
+
+![Training Jobs](./Output Images/Training Jobs.png) 
+
 The one named ‘snake-classifier-‘ is the training job with best parameters. The others are hyperparameter training jobs
 
-
 - Logs metrics during the training process
+![Training Logs](./Output Images/Training Logs.png)
+
+
+![Hyper Parameter Tuning Logs](./Output Images/Logs Hyperparameter tuning.png)
+ 
 - Tune at least two hyperparameters
+![HPO Parameters](./Output Images/HPO Ranges.png)
+
 - Retrieve the best best hyperparameters from all your training jobs
+![HPO Parameters](./Output Images/Best HP.png)
 
 ## Debugging and Profiling
-**TODO**: Give an overview of how you performed model debugging and profiling in Sagemaker
+Using smdebug library debugging and profiling was done. The following rules were added
+rules = [
+    Rule.sagemaker(rule_configs.vanishing_gradient()),
+    Rule.sagemaker(rule_configs.overfit()),
+    Rule.sagemaker(rule_configs.overtraining()),
+    ProfilerRule.sagemaker(rule_configs.ProfilerReport())
+]
+collection_configs = [
+    CollectionConfig(
+        name="train_loss",  # Custom collection for training loss
+        parameters={"include_regex": ".*CrossEntropyLoss_output.*", "save_interval": "10"}
+    ),
+    CollectionConfig(
+        name="eval_losses",  # Custom collection for evaluation loss
+        parameters={"include_regex": ".*CrossEntropyLoss_output.*", "save_interval": "10"}
+    )]
+Hooks were also added to train_model.py
+
+The results were as follows
+
+![HPO Parameters](./Output Images/Debug Training loss.png)
 
 ### Results
-**TODO**: What are the results/insights did you get by profiling/debugging your model?
+What are the results/insights did you get by profiling/debugging your model?
+As seen above the training loss decreased with each step which is a good sign
 
-**TODO** Remember to provide the profiler html/pdf file in your submission.
 
 
 ## Model Deployment
-**TODO**: Give an overview of the deployed model and instructions on how to query the endpoint with a sample input.
+Give an overview of the deployed model and instructions on how to query the endpoint with a sample input.
+Since sagemakers default handlers did not work for image input I had to define my own inference.py to tweak the model_fn(),input_fn(), predict_fn() and output_fn() with my own custom functions to transform the input image and also the serve the outputs in an understandable way. I also had to define the serializer for reading image input and a reserialize to output a string since the defaults threw an error. With all this the model was deployed to the following endpoint in S3:
 
-**TODO** Remember to provide a screenshot of the deployed active endpoint in Sagemaker.
+![HPO Parameters](./Output Images/Deploy.png)
 
-## Standout Suggestions
-**TODO (Optional):** This is where you can provide information about any standout suggestions that you have attempted.
+Endpoint:
+![HPO Parameters](./Output Images/Deployed Endpoint.png)
+
+Querying from Endpoint:
+![HPO Parameters](./Output Images/Deploy Query.png)
+
+![HPO Parameters](./Output Images/Deploy query op.png)
+
