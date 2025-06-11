@@ -59,7 +59,7 @@ The results were as follows
 
 ![Debug Result](./Output%20Images/Debug%20Training%20loss.png)
 
-Profiler html/pdf file can be found at "CD0387-deep-learning-topics-within-computer-vision-nlp-project-starter/ProfilerReport/profiler-output/profiler-report.html"
+Profiler html/pdf file can be found at "CD0387-deep-learning-topics-within-computer-vision-nlp-project-starter/profiler-report.html"
 
 ### Results
 What are the results/insights did you get by profiling/debugging your model?
