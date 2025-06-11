@@ -33,7 +33,7 @@ The one named ‘snake-classifier-‘ is the training job with best parameters. 
 ![HPO Parameters](./Output Images/HPO Ranges.png)
 
 - Retrieve the best best hyperparameters from all your training jobs
-![HPO Parameters](./Output Images/Best HP.png)
+![Best HPO](./Output Images/Best HP.png)
 
 ## Debugging and Profiling
 Using smdebug library debugging and profiling was done. The following rules were added
@@ -56,7 +56,7 @@ Hooks were also added to train_model.py
 
 The results were as follows
 
-![HPO Parameters](./Output Images/Debug Training loss.png)
+![Debug Result](./Output Images/Debug Training loss.png)
 
 ### Results
 What are the results/insights did you get by profiling/debugging your model?
@@ -68,13 +68,13 @@ As seen above the training loss decreased with each step which is a good sign
 Give an overview of the deployed model and instructions on how to query the endpoint with a sample input.
 Since sagemakers default handlers did not work for image input I had to define my own inference.py to tweak the model_fn(),input_fn(), predict_fn() and output_fn() with my own custom functions to transform the input image and also the serve the outputs in an understandable way. I also had to define the serializer for reading image input and a reserialize to output a string since the defaults threw an error. With all this the model was deployed to the following endpoint in S3:
 
-![HPO Parameters](./Output Images/Deploy.png)
+![Deploy Code](./Output%20Images/Deploy.png)
 
 Endpoint:
-![HPO Parameters](./Output Images/Deployed Endpoint.png)
+![Endpoint Image](./Output%20Images/Deployed%20Endpoint.png)
 
 Querying from Endpoint:
-![HPO Parameters](./Output Images/Deploy Query.png)
+![Query Endpoint](./Output%20Images/Deploy%20Query.png)
 
-![HPO Parameters](./Output Images/Deploy query op.png)
+![Final Output](./Output%20Images/Deploy%20query%20op.png)
 
