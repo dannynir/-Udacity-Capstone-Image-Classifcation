@@ -3,3 +3,4 @@ data/
 # Ignore specific files
 capstone.pem
 dogImages.zip
+model.tar.gz
