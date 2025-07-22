@@ -1,4 +1,5 @@
 data/
+model_dir/
 
 # Ignore specific files
 capstone.pem
