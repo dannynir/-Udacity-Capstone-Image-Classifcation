@@ -1,18 +1,36 @@
-# Image Classification using AWS SageMaker
+# Udacity Capstone: Snake Image Classification using AWS SageMaker
 
-This project demonstrates how to use AWS SageMaker to train a pretrained model for image classification using profiling, debugging, hyperparameter tuning, and other ML engineering best practices. While the provided dataset is a dog breed classification dataset, this project was implemented using a snake classification dataset with 5 snake classes.
+The core problem tackled in this project is to develop an automated system that can accurately identify a snake's species from a photograph. Formally, this is structured as a multi-class image classification problem in the field of computer vision and machine learning. The retrained model is deployed as a web application on AWS (Amazon Web Services). In the final application, a user can upload a snake photo, and the system will return the predicted species of the snake
 
 ## Project Set Up and Installation
 Enter AWS through the gateway in the course and open SageMaker Studio. 
 Download the starter files.
 Download/Make the dataset available. 
 
+##Software and libraries
+Flask
+pytorch
+Sagemaker
+smdebug
+boto3
+torch
+torchvision
+numpy
+Pillow
+requests
+flask
+pandas
+
 ## Dataset
-I used a snake classification dataset with 5 classes instead of the dogbreed classification dataset
-The project is designed to be dataset independent so if there is a dataset that is more interesting or relevant to your work, you are welcome to use it to complete the project.
+The dataset used in this project was sourced from the Kaggle “Pre-processed Snake Images” collection, featuring 1,300 labeled images representing five snake species: Northern Water Snake, Common Garter Snake, Dekay’s Brown Snake, Black Rat Snake, and Western Diamondback Rattlesnake. Each image was preprocessed for size and quality and resized to 384x384 pixels. The total dataset size is about 1.1 GB. The data was pulled into jupyter notebook as follows:
+
+import kagglehub
+
+# Download latest version
+path = kagglehub.dataset_download("sameeharahman/preprocessed-snake-images")
 
 ### Access
-The dataset was uploaded to an S3 bucket to allow SageMaker access during training and inference.
+The dataset was uploaded to an S3 bucket to allow SageMaker access during training and inference.So running the notebook should automatically pull the data and upload to S3
 
 ## Hyperparameter Tuning
 I chose to finetune the resnet50 model due to its relevance to image classification. The data had 5 classes, so I attached a linear layer with outcome size of 5. I chose to tune hyper parameters related to learning rate in the range from 0.0001 to 0.01 and batch size in the range of [32, 64, 128]
@@ -29,7 +47,7 @@ The one named ‘snake-classifier-‘ is the training job with best parameters. 
 
 ![Hyper Parameter Tuning Logs](./Output%20Images/Logs%20Hyperparameter%20tuning.png) 
  
-- Tune at least two hyperparameters
+- Tune the two hyperparameters
 ![HPO Parameters](./Output%20Images/HPO%20Ranges.png)  
 
 - Retrieve the best best hyperparameters from all your training jobs
@@ -61,24 +79,32 @@ The results were as follows
 
 Profiler html/pdf file can be found at "CD0387-deep-learning-topics-within-computer-vision-nlp-project-starter/profiler-report.html"
 
-### Results
-What are the results/insights did you get by profiling/debugging your model?
-As seen above the training loss decreased with each step which is a good 
-Other rules like vanishing gradients or overfitting did not trigger alerts.
-
 
 
 ## Model Deployment
-Give an overview of the deployed model and instructions on how to query the endpoint with a sample input.
-Since sagemakers default handlers did not work for image input I had to define my own inference.py to tweak the model_fn(),input_fn(), predict_fn() and output_fn() with my own custom functions to transform the input image and also the serve the outputs in an understandable way. I also had to define the serializer for reading image input and a reserialize to output a string since the defaults threw an error. This enabled the endpoint to receive .jpg images and return class label predictions. With all this the model was deployed to the following endpoint in S3:
+In addition to the SageMaker endpoint, a more customized deployment was done to demonstrate a complete end-to-end application with a user interface using docker and Flask API based web app. EC2 instance was utilizing to run this application
 
-![Deploy Code](./Output%20Images/Deploy.png)
+1.The UI was launched with the following steps:
+2.Need the .pem file from EC2 in same folder as the terminal
+3.Run chmod 400 <my-key>.pem to set correct permissions
+4.SSH into EC2 instance using : ssh -i capstone.pem ec2-user@98.81.229.174
+5.Once into EC2 terminal run this:
+cd ~/web_app
+pip3 install -r requirements.txt
+sudo python3 application.py
 
-Endpoint:
-![Endpoint Image](./Output%20Images/Deployed%20Endpoint.png)
+The UI needs to be run within EC2 terminal as "sudo python3 application.py" at which point the UI will launch at http://98.81.229.174/ 
 
-Querying from Endpoint:
-![Query Endpoint](./Output%20Images/Deploy%20Query.png)
+Docker Container pushed to ECR:
+![ECR](./Output%20Images/ECRDeployedmodelDocker.png)
 
-![Final Output](./Output%20Images/Deploy%20query%20op.png)
+Endpoint (from Docker container in ECR):
+![Endpoint Image](./Output%20Images/DockerEndpoint.png)
+
+UI (at launch):
+![UI Launch](./Output%20Images/WebAppUI.png)
+
+UI (Model Results):
+![UI Launch](./Output%20Images/WebAppUIresults.png)
+
 
